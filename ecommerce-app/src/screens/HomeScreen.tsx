@@ -5,49 +5,29 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Image,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/native-stack/types";
 import { HomeStackParamList } from "../types/navigation";
-
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "Premium Headphones",
-    price: "$299",
-    color: "#D946EF",
-    icon: "🎧",
-  },
-  {
-    id: 2,
-    name: "Smart Watch",
-    price: "$399",
-    color: "#3B82F6",
-    icon: "⌚",
-  },
-  {
-    id: 3,
-    name: "Wireless Earbuds",
-    price: "$199",
-    color: "#10B981",
-    icon: "🎵",
-  },
-  {
-    id: 4,
-    name: "Laptop Pro",
-    price: "$1299",
-    color: "#F97316",
-    icon: "💻",
-  },
-];
+import { useGetProductsQuery } from "../store/productApi";
+import { FlatList } from "react-native";
 
 type Props = {
   navigation: NativeStackNavigationProp<HomeStackParamList>;
 };
 
-const HomeScreen = ({ navigation }: Props) => {
+const HomeScreen = ({ navigation }: any) => {
+  const { data, isLoading, error } = useGetProductsQuery();
+
+  if (isLoading) {
+    return <Text>Loading...</Text>;
+  }
+  if (error) {
+    return <Text>Error loading data</Text>;
+  }
   return (
     <View style={styles.container}>
       {/* HEADER */}
@@ -115,24 +95,34 @@ const HomeScreen = ({ navigation }: Props) => {
       </View>
 
       {/* PRODUCTS LIST */}
-     <View style={styles.productsContainer}>
-  {PRODUCTS.map((item) => (
-    <TouchableOpacity key={item.id} style={styles.productCard} onPress={() => navigation.navigate("ProductDetails")}>
-      <View
-        style={[
-          styles.productImage,
-          { backgroundColor: item.color },
-        ]}
-      >
-        <Text style={styles.productEmoji}>{item.icon}</Text>
-      </View>
+      {/* <View style={styles.productsContainer}> */}
+      <FlatList
+        data={data}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={2}
+        initialNumToRender={6}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
+        contentContainerStyle={{ paddingBottom: 100 }}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.card} onPress={()=> navigation.navigate('ProductDetails',{ product:item})}>
+            <View style={styles.imageContainer}>
+              <Image
+                source={{ uri: item.image }}
+                style={styles.image}
+                resizeMode="contain"
+              />
+            </View>
 
-      <Text style={styles.productName}>{item.name}</Text>
-      <Text style={styles.productPrice}>{item.price}</Text>
-    </TouchableOpacity>
-  ))}
-</View>
+            <Text numberOfLines={2} style={styles.title}>
+              {item.title}
+            </Text>
+
+            <Text style={styles.price}>${item.price}</Text>
+          </TouchableOpacity>
+        )}
+      />
     </View>
+    // </View>
   );
 };
 
@@ -147,12 +137,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  },
-
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#1C1C1E",
   },
 
   subtitle: {
@@ -233,15 +217,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   productsContainer: {
-   flexDirection: "row",
-  flexWrap: "wrap",
-  justifyContent: "space-between",
-  marginTop: 15,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginTop: 15,
   },
 
   productCard: {
     width: "48%",
-  marginBottom: 20,
+    marginBottom: 20,
   },
 
   productImage: {
@@ -264,6 +248,47 @@ const styles = StyleSheet.create({
     marginTop: 5,
     color: "#0A84FF",
     fontWeight: "bold",
+  },
+
+  card: {
+    flex: 1,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 12,
+    marginBottom: 16,
+    marginHorizontal: 6,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+
+    elevation: 3,
+  },
+
+  imageContainer: {
+    height: 120,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+
+  image: {
+    width: "80%",
+    height: "100%",
+  },
+
+  title: {
+    fontSize: 13,
+    color: "#555",
+    fontWeight: "500",
+  },
+
+  price: {
+    marginTop: 6,
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#6C5CE7",
   },
 });
 

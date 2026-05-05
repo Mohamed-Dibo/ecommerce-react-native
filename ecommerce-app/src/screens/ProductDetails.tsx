@@ -5,17 +5,26 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/cartSlice";
+ import { CartItem } from "../types/cart";
 
-const ProductDetails = ({ navigation }: any) => {
-    const dispatch = useDispatch();
+
+const ProductDetails = ({ route, navigation }: any) => {
+  const dispatch = useDispatch();
+  const { product } = route.params;
+   const cart = useSelector((state: any) : CartItem[] => state.cart.items);
+   const isInCart = cart.some(item => item.id === product.id)
+
+   console.log(isInCart)
   return (
-    <ScrollView style={styles.container}
-     contentContainerStyle={{ paddingBottom: 120 }}>
-
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 120 }}
+    >
       {/* IMAGE HEADER */}
       <View style={styles.imageContainer}>
         <TouchableOpacity
@@ -29,22 +38,27 @@ const ProductDetails = ({ navigation }: any) => {
           <Ionicons name="heart-outline" size={20} />
         </TouchableOpacity>
 
-        <Text style={styles.productEmoji}>🎧</Text>
+        <Image
+          source={{ uri: product.image }}
+          style={styles.image}
+           resizeMode="contain"
+          
+        />
       </View>
 
       {/* INFO */}
       <View style={styles.infoContainer}>
         <View style={styles.row}>
-          <Text style={styles.title}>Premium Headphones</Text>
-          <Text style={styles.price}>$299</Text>
+          <Text style={styles.title}>{product.name}</Text>
+          <Text style={styles.price}>{product.price}</Text>
         </View>
 
         <Text style={styles.rating}>⭐ 4.8 (128 reviews)</Text>
 
         <Text style={styles.sectionTitle}>Description</Text>
         <Text style={styles.description}>
-          Experience crystal-clear audio with active noise cancellation.
-          Perfect for music lovers and professionals.
+          Experience crystal-clear audio with active noise cancellation. Perfect
+          for music lovers and professionals.
         </Text>
 
         <Text style={styles.sectionTitle}>Features</Text>
@@ -62,11 +76,13 @@ const ProductDetails = ({ navigation }: any) => {
         </View>
 
         {/* BUTTON */}
-        <TouchableOpacity style={styles.button} onPress={() =>{
-             dispatch(addToCart({ id: 1, name: "Premium Headphones", price: 299, qty: 1 }))
-                navigation.navigate("Cart");
-            }}>
-          <Text style={styles.buttonText} >🛒 Add to Cart</Text>
+        <TouchableOpacity
+          style={[styles.button, isInCart && { backgroundColor: "green"}]}
+          onPress={() => {
+            dispatch(addToCart(product));
+          }}
+        >
+          <Text style={styles.buttonText}>{isInCart ? 'Added' : '🛒 Add to Cart'}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -74,7 +90,6 @@ const ProductDetails = ({ navigation }: any) => {
 };
 
 export default ProductDetails;
-
 
 const styles = StyleSheet.create({
   container: {
@@ -170,5 +185,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  image: {
+    width: 200,
+    height:200
   },
 });
