@@ -11,6 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/cartSlice";
  import { CartItem } from "../types/cart";
+import { toggleFavorite } from "../store/favoritesSlice";
 
 
 const ProductDetails = ({ route, navigation }: any) => {
@@ -19,7 +20,10 @@ const ProductDetails = ({ route, navigation }: any) => {
    const cart = useSelector((state: any) : CartItem[] => state.cart.items);
    const isInCart = cart.some(item => item.id === product.id)
 
-   console.log(isInCart)
+  const fav = useSelector((state:any) => state.favorites.items)
+ 
+  const inFav = fav.some((itm :any) => itm.id === product.id)
+
   return (
     <ScrollView
       style={styles.container}
@@ -34,8 +38,8 @@ const ProductDetails = ({ route, navigation }: any) => {
           <Ionicons name="arrow-back" size={20} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.heartBtn}>
-          <Ionicons name="heart-outline" size={20} />
+        <TouchableOpacity style={styles.heartBtn} onPress={()=> dispatch(toggleFavorite(product))}>
+          <Ionicons name={inFav ? 'heart' : "heart-outline"}  color={inFav ? "red" : "gray"} size={20} />
         </TouchableOpacity>
 
         <Image

@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import HomeStack from "./HomeStack";
 import CartScreen from "../screens/CartScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+import FavoritesScreen from "../screens/FavoritesScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -40,6 +41,7 @@ const TabNavigator = () => {
           if (route.name === "Home") iconName = "home";
           else if (route.name === "Cart") iconName = "cart";
           else if (route.name === "Profile") iconName = "person";
+          else if (route.name === "Favorites") iconName = "heart";
 
           return (
             <View
@@ -64,6 +66,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Cart" component={CartScreen} />
+      <Tab.Screen name="Favorites" component={FavoritesScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
