@@ -7,8 +7,11 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../store/cartSlice";
 
 const ProductDetails = ({ navigation }: any) => {
+    const dispatch = useDispatch();
   return (
     <ScrollView style={styles.container}
      contentContainerStyle={{ paddingBottom: 120 }}>
@@ -59,8 +62,11 @@ const ProductDetails = ({ navigation }: any) => {
         </View>
 
         {/* BUTTON */}
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>🛒 Add to Cart</Text>
+        <TouchableOpacity style={styles.button} onPress={() =>{
+             dispatch(addToCart({ id: 1, name: "Premium Headphones", price: 299, qty: 1 }))
+                navigation.navigate("Cart");
+            }}>
+          <Text style={styles.buttonText} >🛒 Add to Cart</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

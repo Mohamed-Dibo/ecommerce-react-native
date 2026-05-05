@@ -7,6 +7,9 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
+import { CartItem } from "../types/cart";
+import { decreaseQty, increaseQty, removeFromCart } from "../store/cartSlice";
 
 const initialCart = [
   { id: 1, name: "Headphones", price: 299, qty: 1, color: "#D946EF", icon: "🎧" },
@@ -15,33 +18,9 @@ const initialCart = [
 ];
 
 const CartScreen = () => {
-  const [cart, setCart] = useState(initialCart);
 
-  const increaseQty = (id: number) => {
-    setCart((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, qty: item.qty + 1 } : item
-      )
-    );
-  };
-
-  const decreaseQty = (id: number) => {
-    setCart((prev) =>
-      prev.map((item) =>
-        item.id === id && item.qty > 1
-          ? { ...item, qty: item.qty - 1 }
-          : item
-      )
-    );
-  };
-
-  const removeItem = (id: number) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const shipping = 15;
-  const total = subtotal + shipping;
+    const cart = useSelector((state: any) : CartItem[] => state.cart.items);
+    const dispatch = useDispatch();
 
   return (
     <ScrollView style={styles.container}>
@@ -49,7 +28,7 @@ const CartScreen = () => {
       <Text style={styles.title}>Shopping Cart</Text>
       <Text style={styles.subtitle}>{cart.length} items</Text>
 
-      {cart.map((item) => (
+      {cart.map((item : CartItem) => (
         <View key={item.id} style={styles.card}>
 
           <View style={[styles.image, { backgroundColor: item.color }]}>
@@ -63,7 +42,7 @@ const CartScreen = () => {
             <View style={styles.qtyRow}>
               <TouchableOpacity
                 style={styles.qtyBtn}
-                onPress={() => decreaseQty(item.id)}
+                onPress={() => dispatch(decreaseQty(item.id))}
               >
                 <Text>-</Text>
               </TouchableOpacity>
@@ -72,14 +51,14 @@ const CartScreen = () => {
 
               <TouchableOpacity
                 style={[styles.qtyBtn, styles.plus]}
-                onPress={() => increaseQty(item.id)}
+                onPress={() => dispatch(increaseQty(item.id))}
               >
                 <Text style={{ color: "#fff" }}>+</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          <TouchableOpacity onPress={() => removeItem(item.id)}>
+          <TouchableOpacity onPress={() => dispatch(removeFromCart(item.id))} style={{ padding: 10 }}>
             <Ionicons name="trash-outline" size={22} color="red" />
           </TouchableOpacity>
 
@@ -88,9 +67,9 @@ const CartScreen = () => {
 
       {/* TOTAL */}
       <View style={styles.totalBox}>
-        <Text>Subtotal: ${subtotal}</Text>
-        <Text>Shipping: ${shipping}</Text>
-        <Text style={styles.total}>Total: ${total}</Text>
+        <Text>Subtotal:${cart.reduce((acc, item) => acc + (item.price * item.qty), 0).toFixed(2)} </Text>
+        <Text>Shipping: $0.00</Text>
+        <Text style={styles.total}>Total: ${cart.reduce((acc, item) => acc + (item.price * item.qty), 0).toFixed(2)}</Text>
       </View>
 
       {/* BUTTON */}
