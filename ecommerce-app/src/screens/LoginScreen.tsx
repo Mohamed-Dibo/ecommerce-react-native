@@ -8,18 +8,36 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAsync } from "../store/authSlice";
-
+import CustomInput from "../components/CustomInput";
 
 const LoginScreen = () => {
   const dispatch = useDispatch<any>();
-  const auth =useSelector((state :any ) =>state.auth)
-    
+  const auth = useSelector((state: any) => state.auth);
+  const { loading } = useSelector((state: any) => state.auth);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
   const handleLogin = async () => {
-    await dispatch((loginAsync as any)({ email, password,token : 'verified' }));
+    setEmailError("");
+    setPasswordError("");
+
+    let valid = true;
+    if (!email.includes("@")) {
+      setEmailError("Invalid email");
+      valid = false;
+    }
+    if (password.length < 7) {
+      setPasswordError("Password must be at least 6 characters");
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    await dispatch((loginAsync as any)({ email, password, token: "verified" }));
   };
 
   return (
@@ -29,32 +47,36 @@ const LoginScreen = () => {
       <Text style={styles.subtitle}>Login to continue</Text>
 
       {/* Email */}
-      <TextInput
+      <CustomInput
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
-        style={styles.input}
+        error={emailError}
       />
 
       {/* Password */}
-      <TextInput
+      <CustomInput
         placeholder="Password"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
-        style={styles.input}
+        error={passwordError}
       />
 
       {/* Button */}
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>
+          {" "}
+          <Text style={styles.buttonText}>
+            {loading ? "Loading..." : "Login"}
+          </Text>
+        </Text>
       </TouchableOpacity>
     </View>
   );
 };
 
 export default LoginScreen;
-
 
 const styles = StyleSheet.create({
   container: {

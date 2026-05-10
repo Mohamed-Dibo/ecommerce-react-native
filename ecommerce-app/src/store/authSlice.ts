@@ -7,6 +7,7 @@ type AuthState = {
   token: string | null;
   isLoggedIn: boolean;
   isHydrated: boolean;
+  loading: boolean;
 };
 
 const initialState: AuthState = {
@@ -15,6 +16,7 @@ const initialState: AuthState = {
   token: null,
   isLoggedIn: false,
   isHydrated: false,
+  loading: false,
 };
 
 export const loginAsync = createAsyncThunk(
@@ -50,6 +52,10 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.isLoggedIn = true;
       })
+      .addCase(loginAsync.pending, (state) => {
+        state.loading = true;
+      })
+
       .addCase(loadAuth.fulfilled, (state, action: PayloadAction<any>) => {
         if (action.payload) {
           state.email = action.payload.email;
