@@ -7,8 +7,12 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { logoutAsync } from "../store/authSlice";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../store";
 
 const ProfileScreen = () => {
+  const dispatch = useDispatch<AppDispatch>();
   return (
     <ScrollView
       style={styles.container}
@@ -36,13 +40,13 @@ const ProfileScreen = () => {
       <MenuItem icon="settings-outline" title="Settings" />
 
       {/* LOGOUT */}
-      <TouchableOpacity style={styles.logoutBtn}>
+      <TouchableOpacity style={styles.logoutBtn} onPress={()=>dispatch(logoutAsync())}>
         <Ionicons name="log-out-outline" size={20} color="red" />
         <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>
     </ScrollView>
   );
-};
+}
 
 export default ProfileScreen;
 

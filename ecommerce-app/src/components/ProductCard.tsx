@@ -21,7 +21,7 @@ const ProductCard = ({navigation,items , onPress} :Props) => {
             columnWrapperStyle={{ justifyContent: "space-between" }}
             contentContainerStyle={{ paddingBottom: 100 }}
             renderItem={({ item }) => (
-              <TouchableOpacity style={styles.card} onPress={()=> navigation.navigate('ProductDetails',{ product:item})}>
+              <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('ProductDetails', { product: item } as any)}>
                 <View style={styles.imageContainer}>
                   <Image
                     source={{ uri: item.image }}

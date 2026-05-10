@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  ActivityIndicator
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -22,9 +23,9 @@ type Props = {
 const HomeScreen = ({ navigation }: any) => {
   const { data, isLoading, error } = useGetProductsQuery();
 
-  if (isLoading) {
-    return <Text>Loading...</Text>;
-  }
+
+   if (isLoading) return <ActivityIndicator />
+ 
   if (error) {
     return <Text>Error loading data</Text>;
   }
