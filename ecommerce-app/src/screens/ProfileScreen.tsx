@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,8 +11,72 @@ import { logoutAsync } from "../store/authSlice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../store";
 
+import * as ImagePicker from "expo-image-picker";
+import { Image } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const ProfileScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const [image, setImage] = useState<string | null>(null);
+
+  const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      alert("Permission denied");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+
+      setImage(uri);
+
+      await AsyncStorage.setItem("profileImage", uri);
+    }
+  };
+
+  const takePhoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (!permission.granted) {
+      alert("Camera permission denied");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+
+      setImage(uri);
+
+      await AsyncStorage.setItem("profileImage", uri);
+    }
+  };
+
+  const loadProfileImage = async () => {
+    const savedImage = await AsyncStorage.getItem("profileImage");
+
+    if (savedImage) {
+      setImage(savedImage);
+    }
+  };
+  useEffect(() => {
+    loadProfileImage();
+  }, []);
+
   return (
     <ScrollView
       style={styles.container}
@@ -22,9 +86,18 @@ const ProfileScreen = () => {
 
       {/* USER CARD */}
       <View style={styles.userCard}>
-        <View style={styles.avatar}>
-          <Ionicons name="person" size={30} color="#fff" />
-        </View>
+        <TouchableOpacity onPress={pickImage}>
+          {image ? (
+            <Image source={{ uri: image }} style={styles.avatar} />
+          ) : (
+            <View style={styles.avatar}>
+              <Ionicons name="person" size={30} color="#fff" />
+            </View>
+          )}
+          <TouchableOpacity style={styles.cameraBtn} onPress={takePhoto}>
+            <Text style={styles.cameraText}>Take Photo</Text>
+          </TouchableOpacity>
+        </TouchableOpacity>
 
         <View>
           <Text style={styles.name}>John Doe</Text>
@@ -40,16 +113,18 @@ const ProfileScreen = () => {
       <MenuItem icon="settings-outline" title="Settings" />
 
       {/* LOGOUT */}
-      <TouchableOpacity style={styles.logoutBtn} onPress={()=>dispatch(logoutAsync())}>
+      <TouchableOpacity
+        style={styles.logoutBtn}
+        onPress={() => dispatch(logoutAsync())}
+      >
         <Ionicons name="log-out-outline" size={20} color="red" />
         <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>
     </ScrollView>
   );
-}
+};
 
 export default ProfileScreen;
-
 
 const MenuItem = ({ icon, title, badge }: any) => {
   return (
@@ -69,12 +144,12 @@ const MenuItem = ({ icon, title, badge }: any) => {
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5",
     padding: 20,
+    marginTop: 40,
   },
 
   title: {
@@ -100,15 +175,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 15,
+    marginLeft: 10,
   },
 
   name: {
     fontSize: 18,
     fontWeight: "bold",
+    marginLeft: 20,
   },
 
   email: {
     color: "#666",
+    marginLeft: 20,
   },
 
   menuItem: {
@@ -167,6 +245,18 @@ const styles = StyleSheet.create({
   logoutText: {
     color: "red",
     marginLeft: 8,
+    fontWeight: "bold",
+  },
+  cameraBtn: {
+    backgroundColor: "#7C3AED",
+    padding: 10,
+    borderRadius: 12,
+    marginTop: 10,
+    alignItems: "center",
+  },
+
+  cameraText: {
+    color: "#fff",
     fontWeight: "bold",
   },
 });

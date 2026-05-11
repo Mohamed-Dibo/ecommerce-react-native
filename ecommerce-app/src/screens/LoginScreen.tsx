@@ -9,6 +9,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { loginAsync } from "../store/authSlice";
 import CustomInput from "../components/CustomInput";
+import { sendLocalNotification } from "../utils/notifications";
 
 const LoginScreen = () => {
   const dispatch = useDispatch<any>();
@@ -38,6 +39,7 @@ const LoginScreen = () => {
     if (!valid) return;
 
     await dispatch((loginAsync as any)({ email, password, token: "verified" }));
+    // await sendLocalNotification();
   };
 
   return (

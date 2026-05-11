@@ -1,6 +1,6 @@
 import {Product} from '../types/product'
 export type HomeStackParamList = {
-  Home: undefined;
+  HomeScreen: undefined;
   ProductDetails: undefined;
   Product : Product
 };

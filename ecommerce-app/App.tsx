@@ -8,15 +8,21 @@ import { StyleSheet, Text } from "react-native";
 import { useEffect } from "react";
 import { loadAuth } from "./src/store/authSlice";
 import { useAppDispatch, useAppSelector } from "./src/types/hooks";
+import { requestNotificationPermissions} from "./src/utils/notifications";
 
 const Root = () => {
   const dispatch = useAppDispatch();
   const { isHydrated, isLoggedIn } = useAppSelector((state) => state.auth);
 
+//   useEffect(() => {
+//   requestNotificationPermissions();
+// }, []);
+
   useEffect(() => {
     dispatch(loadAuth());
   }, []);
 
+  
   if (!isHydrated) {
     return <Text>Loading...</Text>;
   }
